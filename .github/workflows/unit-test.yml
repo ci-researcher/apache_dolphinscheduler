@@ -19,7 +19,6 @@ name: Test
 
 on:
   workflow_dispatch:
-  pull_request:
 
 concurrency:
   group: unit-test-${{ github.event.pull_request.number || github.ref }}
@@ -93,13 +92,18 @@ jobs:
 
   unit-test:
     name: Unit-Test (${{ matrix.module }} | Java ${{ matrix.java }})
-    needs: [ paths-filter, generate-matrix, sanity-check ]
-    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
+    needs: [paths-filter, generate-matrix, sanity-check]
+    if: always()
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '8', '11' ]
+        java:
+          - 16
+          - 17
+          - 21
+          - 25
         module: ${{ fromJSON(needs.generate-matrix.outputs.matrix).module }}
+      fail-fast: false
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
@@ -113,7 +117,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - uses: actions/cache@v5
         with:
@@ -165,7 +169,7 @@ jobs:
     name: Unit Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [ unit-test, paths-filter, sanity-check ]
+    needs: [unit-test, paths-filter, sanity-check]
     if: always()
     steps:
       - name: Status
