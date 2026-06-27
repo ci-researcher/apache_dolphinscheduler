@@ -1,0 +1,239 @@
+@@ -1,68 +1,235 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ -->
+ <project xmlns="http://maven.apache.org/POM/4.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <properties>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+         <spring.boot.version>2.6.1</spring.boot.version>
+         <java.version>1.8</java.version>
+         <junit.version>5.9.0</junit.version>
+         <mockito.version>3.12.4</mockito.version>
+         <spotbugs.version>3.1.12</spotbugs.version>
+-        <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
++        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+         <maven-source-plugin.version>2.4</maven-source-plugin.version>
+-        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
++        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
++        <asm.version>9.7</asm.version>
++        <byte-buddy.version>1.14.18</byte-buddy.version>
+     </properties>
++    <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>org.ow2.asm</groupId>
++                <artifactId>asm</artifactId>
++                <version>${asm.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.ow2.asm</groupId>
++                <artifactId>asm-commons</artifactId>
++                <version>${asm.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.ow2.asm</groupId>
++                <artifactId>asm-tree</artifactId>
++                <version>${asm.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.ow2.asm</groupId>
++                <artifactId>asm-analysis</artifactId>
++                <version>${asm.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.ow2.asm</groupId>
++                <artifactId>asm-util</artifactId>
++                <version>${asm.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>net.bytebuddy</groupId>
++                <artifactId>byte-buddy</artifactId>
++                <version>${byte-buddy.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>net.bytebuddy</groupId>
++                <artifactId>byte-buddy-agent</artifactId>
++                <version>${byte-buddy.version}</version>
++            </dependency>
++            <!-- JAXB / activation removed from JDK 11+ -->
++            <dependency>
++                <groupId>jakarta.xml.bind</groupId>
++                <artifactId>jakarta.xml.bind-api</artifactId>
++                <version>2.3.3</version>
++            </dependency>
++            <dependency>
++                <groupId>com.sun.xml.bind</groupId>
++                <artifactId>jaxb-impl</artifactId>
++                <version>2.3.9</version>
++            </dependency>
++            <dependency>
++                <groupId>jakarta.activation</groupId>
++                <artifactId>jakarta.activation-api</artifactId>
++                <version>1.2.2</version>
++            </dependency>
++        </dependencies>
++    </dependencyManagement>
+     <build>
+         <pluginManagement>
+             <plugins>
++                <plugin>
++                    <groupId>org.apache.maven.plugins</groupId>
++                    <artifactId>maven-compiler-plugin</artifactId>
++                    <version>${maven-compiler-plugin.version}</version>
++                    <configuration>
++                        <source>${java.version}</source>
++                        <target>${java.version}</target>
++                        <fork>true</fork>
++                        <compilerArgs>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
++                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
++                        </compilerArgs>
++                    </configuration>
++                </plugin>
+                 <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-surefire-plugin</artifactId>
+                     <version>${maven-surefire-plugin.version}</version>
+                     <configuration>
++                        <argLine>
++                            --add-opens java.base/java.lang=ALL-UNNAMED
++                            --add-opens java.base/java.lang.reflect=ALL-UNNAMED
++                            --add-opens java.base/java.lang.invoke=ALL-UNNAMED
++                            --add-opens java.base/java.util=ALL-UNNAMED
++                            --add-opens java.base/java.util.concurrent=ALL-UNNAMED
++                            --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
++                            --add-opens java.base/java.io=ALL-UNNAMED
++                            --add-opens java.base/java.nio=ALL-UNNAMED
++                            --add-opens java.base/sun.nio.ch=ALL-UNNAMED
++                            --add-opens java.base/java.net=ALL-UNNAMED
++                            --add-opens java.base/java.text=ALL-UNNAMED
++                            --add-opens java.base/java.math=ALL-UNNAMED
++                            --add-opens java.base/java.time=ALL-UNNAMED
++                            --add-opens java.xml/jdk.xml.internal=ALL-UNNAMED
++                        </argLine>
+                     </configuration>
+                 </plugin>
+                 <plugin>
+                     <groupId>org.codehaus.mojo</groupId>
+                     <artifactId>rpm-maven-plugin</artifactId>
+                     <version>${rpm-maven-plugion.version}</version>
+                     <inherited>false</inherited>
+                 </plugin>
+                 <plugin>
+                     <groupId>org.codehaus.mojo</groupId>
+                     <artifactId>aspectj-maven-plugin</artifactId>
+                     <version>${aspectj-maven-plugin.version}</version>
+                     <configuration>
+                         <complianceLevel>${java.version}</complianceLevel>
+                         <source>${java.version}</source>
+                         <target>${java.version}</target>
+                         <showWeaveInfo>true</showWeaveInfo>
+                         <verbose>true</verbose>
+                     </configuration>
+                 </plugin>
+             </plugins>
+         </pluginManagement>
+     </build>
++    <profiles>
++        <profile>
++            <id>jdk16plus</id>
++            <activation>
++                <jdk>[16,)</jdk>
++            </activation>
++            <dependencies>
++                <dependency>
++                    <groupId>jakarta.xml.bind</groupId>
++                    <artifactId>jakarta.xml.bind-api</artifactId>
++                    <version>2.3.3</version>
++                </dependency>
++                <dependency>
++                    <groupId>com.sun.xml.bind</groupId>
++                    <artifactId>jaxb-impl</artifactId>
++                    <version>2.3.9</version>
++                    <scope>runtime</scope>
++                </dependency>
++                <dependency>
++                    <groupId>jakarta.activation</groupId>
++                    <artifactId>jakarta.activation-api</artifactId>
++                    <version>1.2.2</version>
++                </dependency>
++            </dependencies>
++            <build>
++                <pluginManagement>
++                    <plugins>
++                        <plugin>
++                            <groupId>org.apache.maven.plugins</groupId>
++                            <artifactId>maven-compiler-plugin</artifactId>
++                            <version>${maven-compiler-plugin.version}</version>
++                            <configuration>
++                                <source>${java.version}</source>
++                                <target>${java.version}</target>
++                                <fork>true</fork>
++                                <compilerArgs>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
++                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
++                                </compilerArgs>
++                            </configuration>
++                        </plugin>
++                        <plugin>
++                            <groupId>org.apache.maven.plugins</groupId>
++                            <artifactId>maven-shade-plugin</artifactId>
++                            <dependencies>
++                                <dependency>
++                                    <groupId>org.ow2.asm</groupId>
++                                    <artifactId>asm</artifactId>
++                                    <version>${asm.version}</version>
++                                </dependency>
++                                <dependency>
++                                    <groupId>org.ow2.asm</groupId>
++                                    <artifactId>asm-commons</artifactId>
++                                    <version>${asm.version}</version>
++                                </dependency>
++                            </dependencies>
++                        </plugin>
++                    </plugins>
++                </pluginManagement>
++            </build>
++        </profile>
++    </profiles>
+ </project>
+\ No newline at end of line
