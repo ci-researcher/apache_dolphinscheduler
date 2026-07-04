@@ -70,6 +70,8 @@ jobs:
       uses: ./.github/actions/sanity-check
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Maven cache dir
+      run: mkdir -p ~/.m2/repository
     - uses: actions/cache@v5
       with:
         path: ~/.m2/repository

@@ -1,13 +1,9 @@
-@@ -60,7 +60,11 @@
-     - name: Build and Package on ${{ matrix.java }}
-       run: |
-         ./mvnw -B clean install \
-+               --no-transfer-progress \
-                -Pstaging \
-                -Dmaven.test.skip=true \
-                -Dspotless.skip=true \
-                -Danalyze.skip=true \
-+               -Dmaven.compiler.release=8 \
-+               -Dmaven.compiler.source=8 \
-+               -Dmaven.compiler.target=8
+@@ -155,1 +155,6 @@
+-  _JAVA_OPTIONS: --add-opens java.base/java
++  _JAVA_OPTIONS: >-
++    --add-opens java.base/java.lang=ALL-UNNAMED
++    --add-opens java.base/java.nio=ALL-UNNAMED
++    --add-opens java.base/sun.nio.ch=ALL-UNNAMED
++    --add-opens java.base/java.util=ALL-UNNAMED
++    --add-opens java.base/java.lang.reflect=ALL-UNNAMED
 \ No newline at end of line
